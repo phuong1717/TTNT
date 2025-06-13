@@ -1,0 +1,84 @@
+def is_valid(board, row, col, num):
+    # Kiểm tra hàng và cột
+    for i in range(4):
+        if board[row][i] == num or board[i][col] == num:
+            return False
+
+    # Kiểm tra ô 2x2
+    start_row, start_col = 2 * (row // 2), 2 * (col // 2)
+    for i in range(2):
+        for j in range(2):
+            if board[start_row + i][start_col + j] == num:
+                return False
+
+    return True
+
+import copy
+
+def solve_dfs(board):
+    for row in range(4):
+        for col in range(4):
+            if board[row][col] == 0:
+                for num in range(1, 5):
+                    if is_valid(board, row, col, num):
+                        board[row][col] = num
+                        if solve_dfs(board):
+                            return True
+                        board[row][col] = 0
+                return False  # Không có số nào hợp lệ
+    return True  # Đã điền đầy đủ
+
+# Gọi hàm DFS
+puzzle = [
+    [1, 0, 0, 4],
+    [0, 0, 2, 0],
+    [0, 1, 0, 0],
+    [3, 0, 0, 2]
+]
+
+print("Kết quả giải bằng DFS:")
+dfs_board = copy.deepcopy(puzzle)
+if solve_dfs(dfs_board):
+    for row in dfs_board:
+        print(row)
+else:
+    print("Không tìm được lời giải.")
+
+
+from collections import deque
+
+def find_empty(board):
+    for row in range(4):
+        for col in range(4):
+            if board[row][col] == 0:
+                return row, col
+    return None
+
+def solve_bfs(start_board):
+    queue = deque()
+    queue.append(start_board)
+
+    while queue:
+        current = queue.popleft()
+        empty = find_empty(current)
+
+        if not empty:
+            return current  # Đã hoàn tất
+
+        row, col = empty
+        for num in range(1, 5):
+            if is_valid(current, row, col, num):
+                new_board = copy.deepcopy(current)
+                new_board[row][col] = num
+                queue.append(new_board)
+
+    return None  # Không có lời giải
+
+# Gọi hàm BFS
+print("\nKết quả giải bằng BFS:")
+bfs_board = solve_bfs(puzzle)
+if bfs_board:
+    for row in bfs_board:
+        print(row)
+else:
+    print("Không tìm được lời giải.")
